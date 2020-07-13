@@ -7,4 +7,35 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="primaryButton" >
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">75sp</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="layout_constraintHorizontal_weight">1</item>
+    </style>
+
+    <style name="numberButton" parent="primaryButton">
+        <item name="android:background">@color/numberButton</item>
+    </style>
+
+    <style name="operationButtonDark" parent="primaryButton">
+        <item name="android:background">@color/operationButtonDark</item>
+    </style>
+
+    <style name="operationButtonLight" parent="primaryButton">
+        <item name="android:background">@color/operationButtonLight</item>
+    </style>
+
+    <style name="primaryTextView" >
+        <item name="android:layout_width">0dp</item>
+        <item name="android:textSize">70sp</item>
+        <item name="android:text">""</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@color/textField</item>
+        <item name="android:layout_margin">3dp</item>
+
+    </style>
+
 </resources>
