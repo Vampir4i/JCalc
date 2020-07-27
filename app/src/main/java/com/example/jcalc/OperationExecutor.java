@@ -16,6 +16,46 @@ public class OperationExecutor {
     private String secondOperand = "";
     private String operation = "";
 
+    public void setCurrentStatus(int currentStatus) {
+        this.currentStatus = currentStatus;
+    }
+
+    public int getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setFirstOperand(String firstOperand) {
+        this.firstOperand = firstOperand;
+    }
+
+    public String getFirstOperand() {
+        return firstOperand;
+    }
+
+    public void setSecondOperand(String secondOperand) {
+        this.secondOperand = secondOperand;
+    }
+
+    public String getSecondOperand() {
+        return secondOperand;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
     public void enterNumber(String num) {
         if(currentStatus == ENTER_FIRST_OPERAND) {
             firstOperand = checkOperand(firstOperand, num);
@@ -107,5 +147,13 @@ public class OperationExecutor {
     @Override
     public String toString() {
         return firstOperand + ' ' + operation + ' ' + secondOperand;
+    }
+
+    public void clearData() {
+        firstOperand = "";
+        secondOperand = "";
+        operation = "";
+        result = "";
+        currentStatus = ENTER_FIRST_OPERAND;
     }
 }
