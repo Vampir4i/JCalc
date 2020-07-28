@@ -10,14 +10,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+/*
+TODO
+Добавить операции корня и степени
+ */
 public class MainActivity extends AppCompatActivity implements View.OnTouchListener, View.OnLongClickListener {
 
     OperationExecutor operationExecutor;
     TextView tvExpression;
     DB db;
     ConstraintLayout mainLayout;
-    float dY = 0;
+    float dX = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         tvExpression.setOnLongClickListener(this);
         mainLayout = findViewById(R.id.mainLayout);
         mainLayout.setOnTouchListener(this);
+        tvExpression.setOnTouchListener(this);
     }
 
     public void numberBtnClick(View view) {
@@ -60,41 +66,43 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
             tvExpression.setText(result);
         } catch (Exception e) {
-            operationExecutor.clearData();
-            tvExpression.setText("");
+            Toast.makeText(this, "Ошибка ввода", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        float y = event.getY();
+        if(v.getId() == R.id.mainLayout){
+            float x = event.getX();
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                dY = y;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if(dY - y > 400) {
-                    dY = 0;
-                    Intent intent = new Intent(this, HistoryActivity.class);
-                    startActivity(intent);
-                }
-                break;
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    dX = x;
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_UP:
+                    if(Math.abs(dX - x) > 200) {
+                        dX = 0;
+                        Intent intent = new Intent(this, HistoryActivity.class);
+                        startActivity(intent);
+                    }
+                    break;
+            }
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean onLongClick(View v) {
-        Intent intent = new Intent(this, HistoryActivity.class);
-        startActivity(intent);
+        operationExecutor.clearData();
+        ((TextView) v).setText("");
         return false;
     }
 
     public void textFieldClick(View view) {
-        operationExecutor.clearData();
-        ((TextView) view).setText("");
+        operationExecutor.deleteSymbol();
+        tvExpression.setText(operationExecutor.toString());
     }
 
     @Override
