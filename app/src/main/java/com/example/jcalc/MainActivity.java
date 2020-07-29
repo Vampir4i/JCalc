@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.MotionEvent;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -14,15 +16,18 @@ import android.widget.Toast;
 
 /*
 TODO
-Добавить операции корня и степени
+-Добавить операции корня и степени
+-Уменьшение размера шрифта при вводе больших чисел
+-При вводе числа после результата, удалять результат
  */
-public class MainActivity extends AppCompatActivity implements View.OnTouchListener, View.OnLongClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
 
     OperationExecutor operationExecutor;
     TextView tvExpression;
+    Button btnEqual;
     DB db;
     ConstraintLayout mainLayout;
-    float dX = 0;
+    float tvTextSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,75 +39,72 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         tvExpression = findViewById(R.id.tv_expression);
         tvExpression.setOnLongClickListener(this);
+        tvTextSize = tvExpression.getTextSize() / getResources().getDisplayMetrics().scaledDensity;
         mainLayout = findViewById(R.id.mainLayout);
-        mainLayout.setOnTouchListener(this);
-        tvExpression.setOnTouchListener(this);
+        btnEqual = findViewById(R.id.btn_equal);
+        btnEqual.setOnLongClickListener(this);
     }
 
     public void numberBtnClick(View view) {
+//        Intent intentVibrate =new Intent(getApplicationContext(),VibrateService.class);
+//        startService(intentVibrate);
+        vibration();
         String textBtn = ((Button) view).getText().toString();
         operationExecutor.enterNumber(textBtn);
         tvExpression.setText(operationExecutor.toString());
+        changeTextSize();
     }
 
     public void operationBtnClick(View view) {
+//        Intent intentVibrate =new Intent(getApplicationContext(),VibrateService.class);
+//        startService(intentVibrate);
+        vibration();
         String textOperation = ((Button) view).getText().toString();
         operationExecutor.enterOperation(textOperation);
         tvExpression.setText(operationExecutor.toString());
+        changeTextSize();
     }
 
     public void executeExpression(View view) {
         try {
             String expression = operationExecutor.toString();
             String result = operationExecutor.execute();
-
             db.addRec(expression, result);
-
-            if (result.length() > 8 && result.length() <= 12) {
-                tvExpression.setTextSize(65);
-            }
-            if (result.length() > 12 && result.length() < 20) {
-                tvExpression.setTextSize(50);
-            }
             tvExpression.setText(result);
+            changeTextSize();
         } catch (Exception e) {
             Toast.makeText(this, "Ошибка ввода", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if(v.getId() == R.id.mainLayout){
-            float x = event.getX();
-
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    dX = x;
-                    break;
-                case MotionEvent.ACTION_CANCEL:
-                case MotionEvent.ACTION_UP:
-                    if(Math.abs(dX - x) > 200) {
-                        dX = 0;
-                        Intent intent = new Intent(this, HistoryActivity.class);
-                        startActivity(intent);
-                    }
-                    break;
-            }
-        }
-        return false;
+    public void changeTextSize() {
+        //Увеличивать размер шрифта на 4sp каждые 8 символов. -2 - из-за пробелов между операндами
+        int currentTextLength = tvExpression.getText().toString().length() - 2;
+        tvExpression.setTextSize(tvTextSize - ((int)(currentTextLength / 8) * 4));
     }
 
     @Override
     public boolean onLongClick(View v) {
-        operationExecutor.clearData();
-        ((TextView) v).setText("");
+        switch(v.getId()){
+            case R.id.tv_expression:
+                operationExecutor.clearData();
+                ((TextView) v).setText(operationExecutor.toString());
+                changeTextSize();
+                break;
+            case R.id.btn_equal:
+                Intent intent = new Intent(this, HistoryActivity.class);
+                startActivity(intent);
+                break;
+        }
         return false;
     }
 
     public void textFieldClick(View view) {
+        vibration();
         operationExecutor.deleteSymbol();
         tvExpression.setText(operationExecutor.toString());
+        changeTextSize();
     }
 
     @Override
@@ -122,6 +124,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         operationExecutor.setSecondOperand(savedInstanceState.getString("secondOperation"));
         operationExecutor.setCurrentStatus(savedInstanceState.getInt("currentStatus"));
         tvExpression.setText(operationExecutor.toString());
+    }
+
+    private void vibration() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(VibrationEffect.createOneShot(100,15));
+        } else {
+            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(150);
+        }
     }
 
     @Override

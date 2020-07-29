@@ -10,8 +10,8 @@ public class OperationExecutor {
     private final int ENTER_SECOND_OPERAND = 2;
     private final int ENTER_AFTER_RESULT = 3;
     private int currentStatus = ENTER_FIRST_OPERAND;
-
-    private final List<String> operations = Arrays.asList("-", "+", "*", "/");
+    //\u221a знак квадратного корня
+    private final List<String> operations = Arrays.asList("-", "+", "*", "/", "^", "\u221a");
 
     private String result = "";
     private String firstOperand = "";
@@ -55,6 +55,10 @@ public class OperationExecutor {
             firstOperand = checkOperand(firstOperand, num);
         } else if(currentStatus == ENTER_SECOND_OPERAND || currentStatus == ENTER_OPERATION) {
             secondOperand = checkOperand(secondOperand, num);
+        } else if(currentStatus == ENTER_AFTER_RESULT) {
+            firstOperand = "";
+            currentStatus = ENTER_FIRST_OPERAND;
+            enterNumber(num);
         }
     }
 
@@ -66,6 +70,11 @@ public class OperationExecutor {
         if(currentStatus == ENTER_FIRST_OPERAND) {
             if(firstOperand.isEmpty()) {
                 if(op.equals("-")) firstOperand = op;
+                if(op.equals("/")) {
+                    firstOperand = "2";
+                    operation = "\u221a";
+                    currentStatus = ENTER_SECOND_OPERAND;
+                }
             } else {
                 if(firstOperand.equals("-") && operations.contains(op)) return;
                 operation = op;
@@ -74,6 +83,8 @@ public class OperationExecutor {
         } else if(currentStatus == ENTER_SECOND_OPERAND) {
             if(secondOperand.isEmpty()) {
                 if(op.equals("-")) secondOperand = op;
+                else if(operation.equals("*") && op.equals("*")) operation = "^";
+                else if(operation.equals("/") && op.equals("/")) operation = "\u221a";
             } else {
                 if(secondOperand.equals("-") && operations.contains(op)) return;
             }
@@ -96,7 +107,8 @@ public class OperationExecutor {
                 oper += num;
             }
         } else {
-            if((operand.equals("0") || operand.equals("-0")) && num.equals("0")) return operand;
+            if((operand.equals("0") || operand.equals("-0")) && !num.equals(".")) return operand;
+            else if(operand.contains(".") && num.equals(".")) return operand;
             else oper += num;
         }
         return oper;
@@ -118,6 +130,12 @@ public class OperationExecutor {
             case "/":
                 result = Double.toString(firstOper / secondOper);
                 break;
+            case "^":
+                result = Double.toString(Math.pow(firstOper, secondOper));
+                break;
+            case "\u221a":
+                result = Double.toString(Math.pow(secondOper, 1/firstOper));
+                break;
         }
         checkResultText();
         firstOperand = result;
@@ -128,6 +146,7 @@ public class OperationExecutor {
     }
 
     public void checkResultText() {
+        //Метод для откугления результата
         BigDecimal bd = new BigDecimal(result);
         bd = bd.setScale(3, RoundingMode.HALF_UP);
         result = bd.toString();

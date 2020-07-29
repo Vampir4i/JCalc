@@ -44,7 +44,7 @@ public class DB {
     }
 
     public Cursor getAllData() {
-        return mDB.query(DB_TABLE, null, null, null, null, null, null);
+        return mDB.query(DB_TABLE, null, null, null, null, null, COLUMN_ID + " DESC");
     }
 
     public void addRec(String exp, String res) {
