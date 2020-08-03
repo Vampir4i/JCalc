@@ -5,21 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/*
-TODO
--Добавить операции корня и степени
--Уменьшение размера шрифта при вводе больших чисел
--При вводе числа после результата, удалять результат
- */
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
 
     OperationExecutor operationExecutor;
@@ -46,9 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void numberBtnClick(View view) {
-//        Intent intentVibrate =new Intent(getApplicationContext(),VibrateService.class);
-//        startService(intentVibrate);
-        vibration();
+        Intent intentVibrate =new Intent(getApplicationContext(),VibrateService.class);
+        startService(intentVibrate);
         String textBtn = ((Button) view).getText().toString();
         operationExecutor.enterNumber(textBtn);
         tvExpression.setText(operationExecutor.toString());
@@ -56,9 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void operationBtnClick(View view) {
-//        Intent intentVibrate =new Intent(getApplicationContext(),VibrateService.class);
-//        startService(intentVibrate);
-        vibration();
+        Intent intentVibrate =new Intent(getApplicationContext(),VibrateService.class);
+        startService(intentVibrate);
         String textOperation = ((Button) view).getText().toString();
         operationExecutor.enterOperation(textOperation);
         tvExpression.setText(operationExecutor.toString());
@@ -101,7 +90,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void textFieldClick(View view) {
-        vibration();
+        Intent intentVibrate =new Intent(getApplicationContext(),VibrateService.class);
+        startService(intentVibrate);
         operationExecutor.deleteSymbol();
         tvExpression.setText(operationExecutor.toString());
         changeTextSize();
@@ -124,14 +114,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         operationExecutor.setSecondOperand(savedInstanceState.getString("secondOperation"));
         operationExecutor.setCurrentStatus(savedInstanceState.getInt("currentStatus"));
         tvExpression.setText(operationExecutor.toString());
-    }
-
-    private void vibration() {
-        if (Build.VERSION.SDK_INT >= 26) {
-            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(VibrationEffect.createOneShot(100,15));
-        } else {
-            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(150);
-        }
     }
 
     @Override

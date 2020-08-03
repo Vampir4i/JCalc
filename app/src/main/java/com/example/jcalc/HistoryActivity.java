@@ -2,6 +2,7 @@ package com.example.jcalc;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,21 +39,14 @@ public class HistoryActivity extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                vibration();
+                Intent intentVibrate =new Intent(getApplicationContext(),VibrateService.class);
+                startService(intentVibrate);
                 db.delRec(id);
                 dbCursor = db.getAllData();
                 cursorAdapter.swapCursor(dbCursor);
                 cursorAdapter.notifyDataSetChanged();
             }
         });
-    }
-
-    private void vibration() {
-        if (Build.VERSION.SDK_INT >= 26) {
-            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(VibrationEffect.createOneShot(100,15));
-        } else {
-            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(150);
-        }
     }
 
     @Override
